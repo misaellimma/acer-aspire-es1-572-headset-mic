@@ -1,0 +1,20 @@
+# Aplica o coeficiente 0x45=0x5089 no widget 0x20 do codec ALC233.
+# Sem esse coeficiente, a porta "Headset Mic" aparece, mas a captacao
+# fica muda: o ajuste de vendor que o driver do Windows faz nao ocorre.
+#
+# O ExecStartPre aguarda o device node do codec existir, pois no boot o
+# servico pode ser iniciado antes de /dev/snd/hwC0D0.
+[Unit]
+Description=Reaplica o coeficiente do microfone de headset ALC233 (Acer ES1-572)
+After=sound.target
+Wants=sound.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sh -c 'i=0; while [ $i -lt 30 ]; do [ -e /dev/snd/hwC0D0 ] && exit 0; i=$((i+1)); sleep 1; done; exit 1'
+ExecStart=/usr/bin/hda-verb /dev/snd/hwC0D0 0x20 SET_COEF_INDEX 0x45
+ExecStart=/usr/bin/hda-verb /dev/snd/hwC0D0 0x20 SET_PROC_COEF 0x5089
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

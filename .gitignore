@@ -1,0 +1,5 @@
+# Gravações de teste e backups locais
+*.wav
+*.bak
+audio-backup-*/
+codec*.txt.local
